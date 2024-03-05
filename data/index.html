@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="refresh" content="2">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>ESP8266 Green House Monitor</title>
+</head>
+<body>
+    <h1>Henhouse Report</h1>
+    <div class="data">
+        <div class="side-by-side temperature-icon">
+            <object type="image/svg+xml" data="temperature-icon.svg"></object>
+        </div>
+        <div class="side-by-side temperature-text">Temperature</div>
+        <div id="indoortemp" class="side-by-side temperature">
+            %INDOORTEMP%<span class="superscript">°F</span>
+        </div>
+    </div>
+    <p><span>High Temperature</span><span id="indoorhigh">%INDOORHIGH%</span></p>
+    <p><span>Low Temperature:</span><span id="indoorlow">%INDOORLOW%</span></p>
+    <div class="data">
+        <div class="side-by-side humidity-icon">
+            <object type="image/svg+xml" data="humidity-icon.svg"></object>
+        </div>
+        <div class="side-by-side humidity-text">Humidity</div>
+        <div id= "indoorhum" class="side-by-side humidity">
+            %INDOORHUM%<span class="superscript">%</span>
+        </div>
+    </div>
+
+    <h1>Outside Report</h1>
+    <div class="data">
+        <div class="side-by-side temperature-icon">
+            <object type="image/svg+xml" data="temperature-icon.svg"></object>
+        </div>
+        <div class="side-by-side temperature-text">Temperature</div>
+        <div id="outdoortemp" class="side-by-side temperature">
+            %OUTDOORTEMP%<span class="superscript">°F</span>
+        </div>
+    </div>
+    <p><span>High Temperature</span><span id="indoorhigh">%OUTDOORHIGH%</span></p>
+    <p><span>Low Temperature:</span><span id="indoorlow">%OUTDOORLOW%</span></p>
+    <div class="data">
+        <div class="side-by-side humidity-icon">
+            <object type="image/svg+xml" data="humidity-icon.svg"></object>
+        </div>
+        <div class="side-by-side humidity-text">Humidity</div>
+        <div id="outdoorhum" class="side-by-side humidity">
+            %OUTDOORHUM%<span class="superscript">%</span>
+        </div>
+    </div>
+    <div class="data">
+        <h1>Water</h1>
+        <div class="side-by-side temperature-icon">
+            <object type="image/svg+xml" data="temperature-icon.svg"></object>
+        </div>
+        <div class="side-by-side temperature-text">Temperature</div>
+        <div id="watertemp" class="side-by-side temperature">
+            %WATERTEMP%<span class="superscript">°F</span>
+        </div>
+    </div>
+    <p><span>High Temperature</span><span id="waterhigh">%WATERHIGH%</span></p>
+    <p><span>Low Temperature:</span><span id="indoorlow">%WATERLOW%</span></p>
+</body>
+</html>
