@@ -198,14 +198,14 @@ void TimeReset()
 {
   time_t sunriseTime;
   time_t sunsetTime; 
-  http.begin(sunriseSunsetUrl);
+  http.begin(client,sunriseSunsetUrl);
   int http_code = http.GET();
   if (http_code > 0) {
     String payload = http.getString();
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, payload);
-    const char* sunrise = doc["results"]["sunrise"].as<char*>();
-    const char* sunset = doc["results"]["sunset"].as<char*>();
+    const char* sunrise = doc["results"]["sunrise"];
+    const char* sunset = doc["results"]["sunset"];
 
     // Parse sunrise and sunset times
     struct tm tmSunrise, tmSunset;
@@ -215,6 +215,7 @@ void TimeReset()
     // Calculate light on and off times based on sunrise and sunset
     sunriseTime = mktime(&tmSunrise);
     sunsetTime = mktime(&tmSunset);
+    doc.clear();
   }
   else
   {

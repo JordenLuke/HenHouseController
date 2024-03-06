@@ -18,7 +18,7 @@ uint8_t Light::setFlag(uint8_t flag)
     status|=flag;
     
     //check to see if the Light is Enabled
-    if((status&ENABLED!= 0))
+    if((status&ENABLED)!= 0)
     {
         if((status&LIGHTONMASK))
         {
@@ -34,7 +34,7 @@ uint8_t Light::clearFlag(uint8_t flag)
     status &= ~flag;
     if((status&ENABLED))
     {
-         if((status&LIGHTONMASK == 0))
+         if((status&LIGHTONMASK )== 0)
          {
             status &= ~STATUS;
             digitalWrite(pin,OFF);
