@@ -45,6 +45,8 @@ const int Smaple_time = 6000;
 const float hen_house_on_temp= 10;
 const float hen_house_off_temp = 20;
 const unsigned long half_hour_millis = 1800000;
+const float water_on_temp = 33.00;
+const float water_off_temp = 35.00;
 
 const char* sunriseSunsetUrl = "https://api.sunrise-sunset.org/json?lat=41.730676&lng=-111.834894";
 
@@ -115,6 +117,8 @@ void setup() {
   light.begin();
   light.enable();
 
+  pinMode(HEATER_PIN,OUTPUT);
+
   if(!LittleFS.begin()) {
     Serial.println("Failed to mount SPIFFS");
     return;
@@ -149,6 +153,14 @@ void loop()
       if(indoor.temperature > hen_house_off_temp)
       {
         light.clearFlag(TEMPFLAG);
+      }
+      if(water.temperature < water_on_temp)
+      {
+        digitalWrite(HEATER_PIN,ON);
+      }
+      if(water.temperature > water_off_temp)
+      {
+        digitalWrite(HEATER_PIN,OFF);
       }
     }
   }
