@@ -65,3 +65,7 @@ void Light::begin()
 {
     pinMode(pin,OUTPUT);
 }
+uint8_t Light::getflags()
+{
+    return status;
+}

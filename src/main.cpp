@@ -40,15 +40,14 @@
 //const 
 const char* ssid = "1776 2.4G";;
 const char* password = "BennettEmma1920";
-const char *world_time_url = "http://worldtimeapi.org/api/ip";
-const int Smaple_time = 6000;
+const char* world_time_url = "http://worldtimeapi.org/api/ip";
+const char* sunriseSunsetUrl = "http://api.sunrise-sunset.org/json?lat=41.730676&lng=-111.834894";
+const int smaple_time = 6000;
 const float hen_house_on_temp= 10;
 const float hen_house_off_temp = 20;
 const unsigned long half_hour_millis = 1800000;
 const float water_on_temp = 33.00;
 const float water_off_temp = 35.00;
-
-const char* sunriseSunsetUrl = "https://api.sunrise-sunset.org/json?lat=41.730676&lng=-111.834894";
 
 
 // golbal variables
@@ -59,6 +58,8 @@ unsigned long millis_at_sunrise= 0; // what time to turn on light before sunrise
 unsigned long millis_at_sunset =0; //when to turn it on bfore sunset
 unsigned long millis_at_6AM =0;
 unsigned long millis_at_9PM=0;
+
+bool heaterOn = OFF; 
 
 
 /****gobal objects ***/
@@ -133,37 +134,75 @@ void setup() {
   });
 
   server.begin();
-  
+  TimeReset(); // rest time to next reset
+  // rest daily highs and lows
+  resetHighLow();
+
+  #ifdef DEBUG
+  Serial.println("End of Setup");
+  #endif
 }
 
 void loop() 
 {
   time_now = millis();
   //sample the sensors
-  if((time_now - time_last) > Smaple_time)
+  if((time_now - time_last) > smaple_time)
   {
     if(getSensors())
     {
       time_last = millis();
+
       if(indoor.temperature < hen_house_on_temp)
       {
-        light.setFlag(TEMPFLAG);
+        #ifdef DEBUG
+        uint8_t temp = light.getflags();
+        #endif
+
+        light.setFlag(SUNRISEFLAG); 
+    
+        #ifdef DEBUG
+        if(temp != light.getflags())
+          Serial.println("Light ON");
+        #endif
       }
       
       if(indoor.temperature > hen_house_off_temp)
       {
-        light.clearFlag(TEMPFLAG);
+        #ifdef DEBUG
+        uint8_t temp = light.getflags();
+        #endif
+
+        light.clearFlag(SUNRISEFLAG);
+        #ifdef DEBUG
+        if(temp != light.getflags())
+        Serial.println("Light OFF");
+        #endif 
       }
+
       if(water.temperature < water_on_temp)
       {
         digitalWrite(HEATER_PIN,ON);
+        #ifdef DEBUG
+        if(heaterOn == OFF)
+          Serial.println("Heater ON");
+        #endif
+        heaterOn = ON;
       }
+
       if(water.temperature > water_off_temp)
       {
         digitalWrite(HEATER_PIN,OFF);
+
+        #ifdef DEBUG
+        if(heaterOn == ON)
+          Serial.println("Heater off");
+        #endif
+        heaterOn = OFF;
       }
     }
   }
+
   if (time_now > millis_at_midnight)
   {
     // reset variables and do whatever else you need to do
@@ -172,23 +211,57 @@ void loop()
     // rest daily highs and lows
     resetHighLow();
   }
-
-  if( millis() >= (millis_at_sunrise - half_hour_millis) && millis() < (millis_at_sunrise + half_hour_millis))
+  time_now = millis();
+  if( time_now >= millis_at_sunrise  && time_now < millis_at_sunrise)
   {
-    light.setFlag(SUNRISEFLAG);
+    #ifdef DEBUG
+    uint8_t temp = light.getflags();
+    #endif
+
+    light.setFlag(SUNRISEFLAG); 
+    #ifdef DEBUG
+    if(temp != light.getflags())
+     Serial.println("Light ON");
+    #endif 
   }
   else
   {
+    #ifdef DEBUG
+    uint8_t temp = light.getflags();
+    #endif
+
     light.clearFlag(SUNRISEFLAG);
+    #ifdef DEBUG
+    if(temp != light.getflags())
+     Serial.println("Light OFF");
+    #endif 
   }
 
-  if(millis() > (millis_at_sunset- half_hour_millis) && millis() < millis_at_9PM)
+  if(time_now >= millis_at_sunset && time_now < millis_at_9PM)
   {
+    #ifdef DEBUG
+    uint8_t temp = light.getflags();
+    #endif
+
     light.setFlag(SUNSETFLAG);
+    
+    #ifdef DEBUG
+    if(temp != light.getflags())
+     Serial.println("Light On");
+    #endif 
   }
   else
   {
+    #ifdef DEBUG
+    uint8_t temp = light.getflags();
+    #endif
+
     light.clearFlag(SUNSETFLAG);
+    
+    #ifdef DEBUG
+    if(temp != light.getflags())
+     Serial.println("Light Off");
+    #endif 
   }
 
   delay(500);
@@ -200,27 +273,35 @@ void TimeReset()
   time_t sunsetTime; 
   http.begin(client,sunriseSunsetUrl);
   int http_code = http.GET();
+ 
   if (http_code > 0) {
+    
     String payload = http.getString();
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, payload);
     const char* sunrise = doc["results"]["sunrise"];
     const char* sunset = doc["results"]["sunset"];
-
+    
     // Parse sunrise and sunset times
-    struct tm tmSunrise, tmSunset;
-    strptime(sunrise, "%I:%M:%S %p", &tmSunrise);
-    strptime(sunset, "%I:%M:%S %p", &tmSunset);
-
-    // Calculate light on and off times based on sunrise and sunset
-    sunriseTime = mktime(&tmSunrise);
-    sunsetTime = mktime(&tmSunset);
+    int sunriseHour, sunriseMinute, sunsetHour, sunsetMinute;
+    sscanf(sunrise, "%d:%d", &sunriseHour, &sunriseMinute);
+    sscanf(sunset, "%d:%d", &sunsetHour, &sunsetMinute);
+    
+    // Calculate light on and off times based on sunrise and sunset for seeconds
+    sunriseTime = (sunriseHour * 3600) + (sunriseMinute * 60);
+    sunsetTime = (sunsetHour * 3600) + (sunsetMinute * 60);
+    
     doc.clear();
+    #ifdef DEBUG
+    Serial.print("Sunrise Time");
+    Serial.println(sunrise);
+    Serial.print("Sunset: ");
+    Serial.println(sunsetTime);
+    #endif
   }
   else
   {
     http.end();
-    client.stop();
     return;
   }
   // get current Unix time from World Time API
@@ -234,47 +315,47 @@ void TimeReset()
     // parse JSON response
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, response);
-    unsigned long unix_time = doc["unixtime"];
-    int raw_offset = doc["raw_offset"]; // offset in second from utc time based on time zone of ip
-    unix_time = unix_time + raw_offset;
+    unsigned long unixTime = doc["unixtime"];//current utc time
+    int rawOffset = doc["raw_offset"]; // offset in second from utc time based on time zone of ip
+    unixTime = unixTime + rawOffset; //currnet time where time is from ip
     // calculate milliseconds until midnight
     //24*60*60 (hours in day * minutes * seconds)
-    unsigned long seconds_since_midnight = unix_time % 86400;
-    unsigned long seconds_until_midnight = 86400 - seconds_since_midnight;
-    unsigned long millistime = millis();
-    millis_at_midnight = millistime + (seconds_until_midnight * 1000);
+    unsigned long secondsSinceMidnight = unixTime % 86400;  //last time it was midnight 
+    unsigned long secondsUntilMidnight = 86400 - secondsSinceMidnight; // next time in seconds  until it is midnight 
+    unsigned long millistime = millis(); 
+    millis_at_midnight = millistime + (secondsUntilMidnight * 1000); // how many millis the millis should be at mid night 
 
     //6*60*60 (6 am * Minutes * seeconds)
-    millis_at_6AM= millistime + ((SIXAMSECONDS-seconds_since_midnight) * 1000);
-    millis_at_9PM = millistime + ((NINEPMSECONDS-seconds_since_midnight) * 1000);
-
-    millis_at_sunrise = millistime + ((sunriseTime + raw_offset- seconds_since_midnight)*1000);
-    millis_at_sunset =  millistime +((sunsetTime + raw_offset - seconds_since_midnight)*1000);
+    millis_at_6AM= millistime + ((SIXAMSECONDS-secondsSinceMidnight) * 1000);  // millis() at 6am to turn on light 
+    millis_at_9PM = millistime + ((NINEPMSECONDS-secondsSinceMidnight) * 1000); //mills at 9 PM  to trun off light 
+    
+    //callcuate what millis will be at sun rise + 30 minutes to turn off light  
+    millis_at_sunrise = millistime + ((sunriseTime + rawOffset- secondsSinceMidnight)*1000) + half_hour_millis;
+    //calculat what millis will be at sun set - 30 minutes to turn on light
+    millis_at_sunset =  millistime + ((sunsetTime + rawOffset - secondsSinceMidnight)*1000) - half_hour_millis;
 
     // output for debugging
     #ifdef DEBUG
-    Serial.println("Current Unix Time: " + String(unix_time));
-    Serial.println("Milliseconds until midnight: " + String(seconds_until_midnight * 1000));
+    Serial.println("Current Unix Time: " + String(unixTime));
+    Serial.println("Milliseconds until midnight: " + String(secondsUntilMidnight * 1000));
     Serial.println("Millis at midnight: " + String(millis_at_midnight));
     #endif
     doc.clear();
   }
 
   http.end();
-
-  client.stop();
 }
 
 bool getSensors()
 {
 
-  if(DHTindoor.sampleData(indoor))
+  if(!DHTindoor.sampleData(indoor))
     return false;
 
-  if(DHToutdoor.sampleData(outdoor))
+  if(!DHToutdoor.sampleData(outdoor))
     return false;
   
-  if(waterDallas.sampleData(water))
+  if(!waterDallas.sampleData(water))
     return false;
 
   return true;
