@@ -6,19 +6,19 @@ function fetchDataAndUpdate() {
             if (xhr.status == 200) {
                 var data = JSON.parse(xhr.responseText);
                 // Update HTML elements with fetched data
-                document.getElementById("indoortemp").innerText = data.indoorTemperature;
-                document.getElementById("indoorhigh").innerText = data.indoorHigh + "°F";
-                document.getElementById("indoorlow").innerText = data.indoorLow + "°F";
-                document.getElementById("indoorhum").innerText = data.indoorHumidity;
+                document.getElementById("indoortemp").innerText = data.indoorTemperature.toFixed(2) + "°F";
+                document.getElementById("indoorhigh").innerText = data.indoorHigh.toFixed(2) + "°F";
+                document.getElementById("indoorlow").innerText = data.indoorLow.toFixed(2) + "°F";
+                document.getElementById("indoorhum").innerText = data.indoorHumidity.toFixed(2) + "%";
 
-                document.getElementById("outdoortemp").innerText = data.outdoorTemperature;
-                document.getElementById("outdoorhigh").innerText = data.outdoorHigh + "°F";
-                document.getElementById("outdoorlow").innerText = data.outdoorLow + "°F";
-                document.getElementById("outdoorhum").innerText = data.outdoorHumidity;
+                document.getElementById("outdoortemp").innerText = data.outdoorTemperature.toFixed(2) + "°F";
+                document.getElementById("outdoorhigh").innerText = data.outdoorHigh.toFixed(2) + "°F";
+                document.getElementById("outdoorlow").innerText = data.outdoorLow.toFixed(2) + "°F";
+                document.getElementById("outdoorhum").innerText = data.outdoorHumidity.toFixed(2)+"%";
 
-                document.getElementById("watertemp").innerText = data.waterTemperature;
-                document.getElementById("waterhigh").innerText = data.waterHigh + "°F";
-                document.getElementById("waterlow").innerText = data.waterLow + "°F";
+                document.getElementById("watertemp").innerText = data.waterTemperature.toFixed(2)+"°F";;
+                document.getElementById("waterhigh").innerText = data.waterHigh.toFixed(2) + "°F";
+                document.getElementById("waterlow").innerText = data.waterLow.toFixed(2) + "°F";
             } else {
                 console.error('Failed to fetch data');
             }

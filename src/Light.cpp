@@ -1,3 +1,17 @@
+/*
+ * Author: Jorden Luke
+ * Date: [Date]
+ * Description: [Brief description of the file's purpose]
+ *
+ * This code is released under the Yerba Mate license:
+ * ----------------------------------------------------------------------------
+ * "THE YERBA MATE LICENSE" (Revision 42):
+ * Jorden Luke <<jorden.luke@gmail.com>> wrote this file. As long as you retain
+ * this notice, you can do whatever you want with this stuff. If we meet some 
+ * day, and you think this stuff is worth it, you can buy me a Yerba Mate in return. 
+ * ----------------------------------------------------------------------------
+ */
+
 #include"Light.h"
 #include <Arduino.h>
 

@@ -1,3 +1,20 @@
+/*
+ * Author: Jorden Luke
+ * Date: 3-5-2024
+ * Description: This is the main file for the Henhouse server. This appication 
+ * controls a loght, and a water heater. Sensors are used to determine when
+ * the light and heater should be turned on. The light is also controlled by
+ * some timers.
+ *
+ * This code is released under the Yerba Mate license:
+ * ----------------------------------------------------------------------------
+ * "THE YERBA MATE LICENSE see Beer-Weare" (Revision 42):
+ * Jorden Luke <<jorden.luke@gmail.com>> wrote this file. As long as you retain
+ * this notice, you can do whatever you want with this stuff. If we meet some 
+ * day, and you think this stuff is worth it, you can buy me a Yerba Mate in return. 
+ * ----------------------------------------------------------------------------
+ */
+
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ESP8266WiFi.h> 
@@ -16,8 +33,12 @@
 #include "Light.h"
 
 
-//define for debug
+//defines for debuging and testing
 #define DEBUG
+//#define FUNCTIONAL_TIMER_TEST
+//#define FUNCTIONAL_SENSOR_TEST
+//#define DATA_TEST
+#define SENSOR_TEST
 
 //Defines for pins
 #define DHTPIN 2
@@ -48,7 +69,7 @@ const float hen_house_off_temp = 20;
 const unsigned long half_hour_millis = 1800000;
 const float water_on_temp = 33.00;
 const float water_off_temp = 35.00;
-
+const size_t buffer_size = JSON_OBJECT_SIZE(12);
 
 // golbal variables
 unsigned long time_now = 0; //updatd everytime it goes through the loop 
@@ -72,6 +93,7 @@ OneWire onewire(DSTTEMP);
 ExtendedDallasTemperature waterDallas(onewire);
 Light light(LIGHT_PIN);
 
+//Connectitvity stuff 
 AsyncWebServer server(80);
 HTTPClient http;
 WiFiClient client;
@@ -96,7 +118,7 @@ void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, password);
   
-  Serial.print("Connecting to WiFi...");
+  Serial.print("\n Connecting to WiFi...");
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.print(".");
@@ -118,7 +140,9 @@ void setup() {
   light.begin();
   light.enable();
 
+  //set up for heater 
   pinMode(HEATER_PIN,OUTPUT);
+  digitalWrite(HEATER_PIN,OFF);
 
   if(!LittleFS.begin()) {
     Serial.println("Failed to mount SPIFFS");
@@ -132,6 +156,26 @@ void setup() {
   server.on("/json",HTTP_GET,[](AsyncWebServerRequest *request){
     request->send(200,"application/json", handleJson());
   });
+  
+  server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS,"/script.js", String(), false,NULL);
+  });
+
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS,"/style.css", "text/css", false,NULL);
+  });
+
+  server.on("/temperature-icon.svg", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS,"/temperature-icon.svg", "image/svg+xml",false,NULL);
+  });
+
+  server.on("/humidity-icon.svg", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS,"/humidity-icon.svg", "image/svg+xml",false,NULL);
+  });
+
+ server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS,"/chicken.png", "image/x-icon",false,NULL);
+  });
 
   server.begin();
   TimeReset(); // rest time to next reset
@@ -139,6 +183,7 @@ void setup() {
   resetHighLow();
 
   #ifdef DEBUG
+  Serial.println("Light Flags: " + String(light.getflags()));
   Serial.println("End of Setup");
   #endif
 }
@@ -147,6 +192,10 @@ void loop()
 {
   time_now = millis();
   //sample the sensors
+  #ifdef DEBUG
+  
+  #endif
+
   if((time_now - time_last) > smaple_time)
   {
     if(getSensors())
@@ -159,7 +208,7 @@ void loop()
         uint8_t temp = light.getflags();
         #endif
 
-        light.setFlag(SUNRISEFLAG); 
+        light.setFlag(TEMPFLAG); 
     
         #ifdef DEBUG
         if(temp != light.getflags())
@@ -173,7 +222,7 @@ void loop()
         uint8_t temp = light.getflags();
         #endif
 
-        light.clearFlag(SUNRISEFLAG);
+        light.clearFlag(TEMPFLAG);
         #ifdef DEBUG
         if(temp != light.getflags())
         Serial.println("Light OFF");
@@ -203,16 +252,16 @@ void loop()
     }
   }
 
-  if (time_now > millis_at_midnight)
-  {
-    // reset variables and do whatever else you need to do
-    TimeReset(); // rest time to next reset
-
-    // rest daily highs and lows
-    resetHighLow();
-  }
+  #ifdef FUNCTIONAL_TIMER_TEST
   time_now = millis();
-  if( time_now >= millis_at_sunrise  && time_now < millis_at_sunrise)
+  Serial.println("Time_now: " +String(time_now));
+  Serial.println("Millis at millis_at_6AM: " + String(millis_at_6AM));
+  Serial.println("Millis at millis_at_sunrise: " + String(millis_at_sunrise));
+  Serial.println("Millis at millis_at_sunset: " + String(millis_at_sunset));
+  Serial.println("Millis at millis_at_9PM: " + String(millis_at_9PM));
+  #endif
+
+  if( time_now >= millis_at_6AM && time_now < millis_at_sunrise)
   {
     #ifdef DEBUG
     uint8_t temp = light.getflags();
@@ -224,27 +273,12 @@ void loop()
      Serial.println("Light ON");
     #endif 
   }
-  else
+  else if(time_now >= millis_at_sunset && time_now < millis_at_9PM)
   {
     #ifdef DEBUG
     uint8_t temp = light.getflags();
     #endif
-
-    light.clearFlag(SUNRISEFLAG);
-    #ifdef DEBUG
-    if(temp != light.getflags())
-     Serial.println("Light OFF");
-    #endif 
-  }
-
-  if(time_now >= millis_at_sunset && time_now < millis_at_9PM)
-  {
-    #ifdef DEBUG
-    uint8_t temp = light.getflags();
-    #endif
-
     light.setFlag(SUNSETFLAG);
-    
     #ifdef DEBUG
     if(temp != light.getflags())
      Serial.println("Light On");
@@ -257,11 +291,21 @@ void loop()
     #endif
 
     light.clearFlag(SUNSETFLAG);
-    
+    light.clearFlag(SUNRISEFLAG);
+
     #ifdef DEBUG
     if(temp != light.getflags())
      Serial.println("Light Off");
     #endif 
+  }
+
+  if (time_now > millis_at_midnight)
+  {
+    // reset variables and do whatever else you need to do
+    TimeReset(); // rest time to next reset
+
+    // rest daily highs and lows
+    resetHighLow();
   }
 
   delay(500);
@@ -289,12 +333,12 @@ void TimeReset()
     
     // Calculate light on and off times based on sunrise and sunset for seeconds
     sunriseTime = (sunriseHour * 3600) + (sunriseMinute * 60);
-    sunsetTime = (sunsetHour * 3600) + (sunsetMinute * 60);
+    sunsetTime = (sunsetHour * 3600) + (sunsetMinute * 60) + (12 *3600);
     
     doc.clear();
     #ifdef DEBUG
     Serial.print("Sunrise Time");
-    Serial.println(sunrise);
+    Serial.println(sunriseTime);
     Serial.print("Sunset: ");
     Serial.println(sunsetTime);
     #endif
@@ -339,6 +383,20 @@ void TimeReset()
     Serial.println("Current Unix Time: " + String(unixTime));
     Serial.println("Milliseconds until midnight: " + String(secondsUntilMidnight * 1000));
     Serial.println("Millis at midnight: " + String(millis_at_midnight));
+    Serial.println("Millis at Sunrise: " + String(millis_at_sunrise));
+    Serial.println("Millis at Sunset: " + String(millis_at_sunset));
+    #endif
+    
+    #ifdef FUNCTIONAL_TIMER_TEST
+    millis_at_sunrise = (18 * 1000) + millistime; 
+    millis_at_6AM = (12 * 1000) + millistime;
+    millis_at_9PM =  (30 * 1000) + millistime;
+    millis_at_sunset = (24 * 1000) + millistime;
+    millis_at_midnight = (60 * 1000) + millistime;
+    Serial.println("Millis at millis_at_6AM: " + String(millis_at_6AM));
+    Serial.println("Millis at millis_at_sunrise: " + String(millis_at_sunrise));
+    Serial.println("Millis at millis_at_sunset: " + String(millis_at_sunset));
+    Serial.println("Millis at millis_at_9PM: " + String(millis_at_9PM));
     #endif
     doc.clear();
   }
@@ -348,39 +406,82 @@ void TimeReset()
 
 bool getSensors()
 {
+  #ifdef DATA_TEST
+  
+  #endif
 
   if(!DHTindoor.sampleData(indoor))
-    return false;
-
+  {
+    #ifdef SENSOR_TEST
+    Serial.println("Failed to get indoor sennsor");
+    #endif
+    //return false;
+  }
+  
   if(!DHToutdoor.sampleData(outdoor))
-    return false;
+  {
+    #ifdef SENSOR_TEST
+    Serial.println("Failed to get outddoor sennsor");
+    #endif
+   //return false;
+  }
   
   if(!waterDallas.sampleData(water))
+  {
+    #ifdef SENSOR_TEST
+    Serial.println("Failed to get Water sennsor");
+    #endif
     return false;
+  }
 
-  return true;
+  return false;
 }
 
 String handleJson()
 {
-  String json = "{";
-  json += "\"temperature\":" + String(indoor.temperature) + ",";
-  json += "\"humidity\":" + String(indoor.humidity) + ",";
-  json += "\"indoorHighTemp\":" + String(indoor.highTemperature) + ",";
-  json += "\"indoorLowTemp\":" + String(indoor.lowTemperature) + ",";
-  json += "\"indoorHighHum\":" + String(indoor.highHumidity) + ",";
-  json += "\"indoorLowHum\":" + String(indoor.lowHumidity) + ",";
-  json += "\"outdoorTemperature\":" + String(outdoor.temperature) + ",";
-  json += "\"outdoorHumidity\":" + String(outdoor.humidity) + ",";
-  json += "\"outdoorHighTemp\":" + String(outdoor.highTemperature) + ",";
-  json += "\"outdoorLowTemp\":" + String(outdoor.lowTemperature) + ",";
-  json += "\"outdoorHighHum\":" + String(outdoor.highHumidity) + ",";
-  json += "\"outdoorLowHum\":" + String(outdoor.lowHumidity) + ",";
-  json += "\"outdoorLowHum\":" + String(water.temperature) + ",";
-  json += "\"outdoorLowHum\":" + String(water.highTemperature) + ",";
-  json += "\"outdoorLowHum\":" + String(outdoor.lowTemperature) + ",";
-  json += "}";
-  return json;
+  #ifdef DATA_TEST
+  indoor.humidity = 24.8;
+  indoor.highHumidity = 30.0;
+  indoor.lowHumidity =17.100;
+  indoor.temperature = 60;
+  indoor.highTemperature =61;
+  indoor.lowTemperature = 45;
+  
+
+  outdoor.humidity = 30.0;
+  outdoor.highHumidity = 30.0;
+  outdoor.lowHumidity =17.100;
+  outdoor.temperature = 60;
+  outdoor.highTemperature =61;
+  outdoor.lowTemperature = 45;
+  
+  water.temperature =45.00;
+  water.highTemperature = 55.00;
+  water.lowTemperature = 60;  
+  #endif
+
+StaticJsonDocument<buffer_size> doc;
+
+// Populate sensor data (example values)
+doc["indoorTemperature"] = indoor.temperature;
+doc["indoorHigh"] = indoor.highTemperature;
+doc["indoorLow"] = indoor.lowTemperature;
+doc["indoorHumidity"] = indoor.humidity;
+
+doc["outdoorTemperature"] = outdoor.temperature;
+doc["outdoorHigh"] = outdoor.highTemperature;
+doc["outdoorLow"] = outdoor.lowTemperature;
+doc["outdoorHumidity"] = outdoor.humidity;
+
+doc["waterTemperature"] = water.temperature;
+doc["waterHigh"] = water.highTemperature;
+doc["waterLow"] = water.lowTemperature;
+
+// Serialize JSON to a String
+String jsonString;
+serializeJson(doc, jsonString);
+
+    return jsonString;
 }
 
 //reset low and high 

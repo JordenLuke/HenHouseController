@@ -1,5 +1,24 @@
+/*
+ * Author: Jorden Luke
+ * Date: 08-Mar-2024
+ * Description: This is a defftion of the Light class. This defines the light
+ * object which encapslates a pin used to control a light. The prupose of 
+ * this object is allow multipal sources to control light with out having one
+ * source turn the light off it has anoter source that needs it on. It is to 
+ * avoid turn on off the relay mutlipe times through the loop. 
+ *
+ * This code is released under the Yerba Mate license:
+ * ----------------------------------------------------------------------------
+ * "THE YERBA MATE LICENSE" (Revision 42):
+ * Jorden Luke <<jorden.luke@gmail.com>> wrote this file. As long as you retain
+ * this notice, you can do whatever you want with this stuff. If we meet some 
+ * day, and you think this stuff is worth it, you can buy me a Yerba Mate in return. 
+ * ----------------------------------------------------------------------------
+ */
+
 #ifndef LIGHT_H
 #define Light_H
+
 #include <Arduino.h>
 
 #define ON false
