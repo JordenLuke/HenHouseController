@@ -1,9 +1,5 @@
-This project ESP8266 project is to contorll a light and waterheating in my chicken coup. Though it may seam like a simple project the light control is a bit more
-avanaced than a typical on off timer. The idea was to maximize the amount of light the chickens get but mimimize teh about of atrifical light. This proejct achives
-this by taking advantage of the https://sunrise-sunset.org/api and "http://worldtimeapi.org/api/ip".
+This project aims to automate the control of light and water heating in my chicken coop using the ESP8266 module. While it may seem straightforward, the light control system incorporates advanced features beyond a simple on-off timer. The primary goal is to optimize the amount of light the chickens receive while minimizing artificial lighting. This is achieved by integrating the "https://sunrise-sunset.org/api" and "http://worldtimeapi.org/api/ip" APIs.
 
-The light control works like this at mid night the 8266 gets the time for sunrise and sunet. Next it gets the current unix time. Once the controller knows what time it is,
-it calaculaces how many milliseonnds till 6am sunrise sunset and 9pm. At six the light will come on and be on till Sunrise + 30min. The light will then come back on at 
-sunset - 30min. The light will aslo trun on when the tempature inside the henhouse hit 10 f. It will then turn off when it hits 20f. 
+The light control system operates as follows: At midnight, the ESP8266 retrieves the sunrise and sunset times. It then requests the current Unix time. This information calculates the time intervals in milliseconds until 6 am, sunrise, sunset, and 9 pm. At 6 am, the light is activated and remains on until 30 minutes after sunrise. It is activated 30 minutes before sunset and remains on until 9 pm. Additionally, the light will be triggered when the temperature inside the henhouse drops to 10°F and turned off when it reaches 20°F.
 
-The water temp is the same idea as the litght tempature control just shifted to trun on when the water is 33.0f and turn off 35.0f
+The water heating control system follows a comparable pattern. It monitors the water temperature and activates the heating element when the temperature drops to 33.0°F. The heating is then deactivated once the temperature reaches 35.0°F.
