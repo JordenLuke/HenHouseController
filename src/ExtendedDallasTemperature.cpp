@@ -1,19 +1,23 @@
 
 #include<ExtendedDallasTemperature.h>
 #include<OneWire.h>
+#include<Arduino.h>
 
-ExtendedDallasTemperature::ExtendedDallasTemperature(OneWire onewire):sensor(&onewire)
+ExtendedDallasTemperature::ExtendedDallasTemperature(OneWire *onewire):sensor(onewire)
 {
     dallasData= {0.0,0};
 }
 
 bool ExtendedDallasTemperature::sampleData(DallasData &data)
 {
-    float temp = sensor.getTempCByIndex(0);
-    if(temp == -127.00)
-        return false; //bad read 
-    
+    sensor.requestTemperaturesByIndex(0);
+    float temp = sensor.getTempFByIndex(0);
     dallasData.temperature = temp;
+    if(temp <= -127.00)
+    {
+        dallasData.temperature = NAN;
+        return false; //bad read    
+    }
 
     if (temp > dallasData.highTemperature) {
         dallasData.highTemperature = temp;

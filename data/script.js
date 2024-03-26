@@ -19,6 +19,9 @@ function fetchDataAndUpdate() {
                 document.getElementById("watertemp").innerText = data.waterTemperature.toFixed(2)+"°F";;
                 document.getElementById("waterhigh").innerText = data.waterHigh.toFixed(2) + "°F";
                 document.getElementById("waterlow").innerText = data.waterLow.toFixed(2) + "°F";
+                
+                document.getElementById("light").checked = data.light;
+
             } else {
                 console.error('Failed to fetch data');
             }
@@ -27,6 +30,13 @@ function fetchDataAndUpdate() {
     xhr.open("GET", "/json", true);
     xhr.send();
 }
+
+function toggleCheckbox(element) {
+    var xhr = new XMLHttpRequest();
+    if(element.checked){ xhr.open("GET", "/update?output="+element.id+"&state=1", true); }
+    else { xhr.open("GET", "/update?output="+element.id+"&state=0", true); }
+    xhr.send();
+  }
 
 // Call fetchDataAndUpdate function on page load
 window.onload = fetchDataAndUpdate;

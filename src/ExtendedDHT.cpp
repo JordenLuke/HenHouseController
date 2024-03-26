@@ -17,8 +17,6 @@
 #include "ExtendedDHT.h"
 #include <DHT.h>
 #include <cmath> // This header already includes the isnan() function
-#include <Arduino.h>
-
 
 ExtendedDHT::ExtendedDHT(int pin, int type) : dhtSensor(pin, type) {
     // Initialize climateData here if needed
@@ -27,10 +25,8 @@ ExtendedDHT::ExtendedDHT(int pin, int type) : dhtSensor(pin, type) {
 
 bool ExtendedDHT::sampleData(Climate &climate) {
         // Sample data from the DHT sensor
-        float temp = dhtSensor.readTemperature();
+        float temp = dhtSensor.readTemperature(true);
         float hum = dhtSensor.readHumidity();
-
-        Serial.println("Temp: " + String(temp));
 
         // Check if the data is valid (not NaN)
         if (!isnan(temp) && !isnan(hum)) {

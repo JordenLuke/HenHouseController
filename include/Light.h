@@ -21,15 +21,15 @@
 
 #include <Arduino.h>
 
-#define ON false
-#define OFF true
+#define ON true
+#define OFF false
 
 //flag defines
-#define TEMPFLAG     0b000001 //flag for setting 
-#define SUNRISEFLAG  0b000010
-#define SUNSETFLAG   0b000100
+#define TEMPFLAG     0b000001  //flag for turning light on by temp 
+#define SUNRISEFLAG  0b000010  //flag used to turn light on at sunrise
+#define SUNSETFLAG   0b000100  //flag to turn light on at sunet 
 #define OVERRIDEON   0b001000  //forces ligt to be on if enaled 
-#define ENABLED      0b010000  //
+#define ENABLED      0b010000  //if this fags isn't enabled then light is off 
 #define STATUS       0b100000  //used to denote if the light is on or off
 #define LIGHTONMASK  0b001111
 

@@ -4,65 +4,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta http-equiv="refresh" content="10" charset="UTF-8">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/style.css">
-    <title>ESP8266 Green House Monitor</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>ESP8266 HenHouse Monitor</title>
 </head>
 <body>
-    <h1>Henhouse Report</h1>
-    <div class="data">
-        <div class="side-by-side temperature-icon">
-            <object type="image/svg+xml" data="/temperature-icon.svg"></object>
+    <div class="grid-container">
+        <div class="item1"> <h1>ESP8266 Hen House Monitor</h1></div>
+        <div class="item2">
+            <h2>Light</h2>
+            <input type="checkbox" id="light" class="checkbox" onchange="toggleCheckbox(this)"/> 
+            <label for="light" class="toggle">
+            <p> OFF    ON</p>
+        </label>
         </div>
-        <div class="side-by-side temperature-text">Temperature</div>
-        <div id="indoortemp" class="side-by-side temperature">
-            Loading...</span>
+        <div class="item3">
+            <h2>Hen House</h2>
+            <div class="data">
+                <div class="side-by-side temperature-icon">
+                    <object type="image/svg+xml" data="temperature-icon.svg"></object>
+                </div>
+                <div class="side-by-side temperature-text">Temperature</div>
+                <div id="indoortemp" class="side-by-side temperature">Loading... </div>
+            </div>
+            <div class="data">
+                <div class="side-by-side high-low-icon"></div>
+                <div class="side-by-side ss-textl">Daily High:<span id="indoorhigh">...</span></div>
+                <div class="side-by-side ss-textr">Daily Low:<span id="indoorlow">...</span></div>
+            </div>
+            <div class="data">
+                <div class="side-by-side humidity-icon">
+                    <object type="image/svg+xml" data="humidity-icon.svg"></object>
+                </div>
+                <div class="side-by-side humidity-text">Humidity</div>
+                <div class="side-by-side humidity" id= "indoorhum">Loading...</div>
+            </div>
+            <div class="data">
+                <h2>Water</h2>
+                <div class="side-by-side temperature-icon">
+                    <object type="image/svg+xml" data="temperature-icon.svg"></object>
+                </div>
+                <div class="side-by-side temperature-text">Temperature</div>
+                <div id="watertemp" class="side-by-side temperature"> Loading...</div>
+            </div>
+            <div class="data">
+                <div class="side-by-side high-low-icon"></div>
+            <div class="side-by-side ss-textl">Daily High:<span id="waterhigh">...</span></div>
+            <div class="side-by-side ss-textr">Daily Low:<span id="waterlow">...</span></div>
+            </div>
         </div>
-    </div>
-    <p>High Temperature: <span id="indoorhigh">Loading...</span></p>
-    <p>Low Temperature: <span id="indoorlow">Loading...</span></p>
-    <div class="data">
-        <div class="side-by-side humidity-icon">
-            <object type="image/svg+xml" data="/humidity-icon.svg"></object>
-        </div>
-        <div class="side-by-side humidity-text">Humidity</div>
-        <div class="side-by-side humidity">
-            <span id= "indoorhum">Loading...</span>
-        </div>
-    </div>
-
-    <h1>Outside Report</h1>
+        
+        <div class="item4">
+            <h2>Outside Report</h2>
     <div class="data">
         <div class="side-by-side temperature-icon">
             <object type="image/svg+xml" data="temperature-icon.svg"></object>
         </div>
         <div class="side-by-side temperature-text">Temperature</div>
         <div id="outdoortemp" class="side-by-side temperature">
-            Loading...<span class="superscript">°F</span>
+            Loading...
         </div>
     </div>
-    <p>High Temperature: <span id="outdoorhigh">Loading...</span></p>
-    <p>Low Temperature: <span id="outdoorlow">Loading...</span></p>
+    <div class="data">
+        <div class="side-by-side high-low-icon"></div>
+        <div class="side-by-side ss-textl">Daily High:<span id="outdoorhigh">...</span></div>
+        <div class="side-by-side ss-textr">Daily Low:<span id="outdoorlow">...</span></div>
+    </div>
     <div class="data">
         <div class="side-by-side humidity-icon">
             <object type="image/svg+xml" data="humidity-icon.svg"></object>
         </div>
         <div class="side-by-side humidity-text">Humidity</div>
         <div id="outdoorhum" class="side-by-side humidity">
-            Loading...<span class="superscript">%</span>
+            Loading...
         </div>
     </div>
-    <div class="data">
-        <h1>Water</h1>
-        <div class="side-by-side temperature-icon">
-            <object type="image/svg+xml" data="temperature-icon.svg"></object>
         </div>
-        <div class="side-by-side temperature-text">Temperature</div>
-        <div id="watertemp" class="side-by-side temperature">
-            Loading...<span class="superscript">°F</span>
-        </div>
+        <div class="item5"><Footer>Test</Footer></div>
     </div>
-    <p>High Temperature: <span id="waterhigh">Loading...</span></p>
-    <p>Low Temperature: <span id="waterlow">Loading...</span></p>
     <script src ="/script.js"> </script>
 </body>
 </html>

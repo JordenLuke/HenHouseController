@@ -12,6 +12,12 @@ body {
 
 h1 {
     margin: 50px auto 30px;
+    font-size: 50px;
+    color: rgb(22, 22, 66);
+}
+
+h2 {
+    color: rgb(22, 22, 66);
 }
 
 .side-by-side {
@@ -32,13 +38,15 @@ h1 {
     font-weight: 600;
     padding-left: 15px;
     font-size: 19px;
-    width: 160px;
+    width: 140px;
     text-align: left;
+    color: rgb(22, 22, 66);
+    
 }
 
 .humidity {
     font-weight: 300;
-    font-size: 60px;
+    font-size: 30px;
     color: #3498db;
 }
 
@@ -54,13 +62,14 @@ h1 {
     font-weight: 600;
     padding-left: 15px;
     font-size: 19px;
-    width: 160px;
+    width: 140px;
     text-align: left;
+    color: rgb(22, 22, 66);
 }
 
 .temperature {
     font-weight: 300;
-    font-size: 60px;
+    font-size: 30px;
     color: #f39c12;
 }
 
@@ -72,6 +81,91 @@ h1 {
     top: 15px;
 }
 
+.ss-texl{
+    padding-left: 15px;
+    width: 140px;
+    text-align: left;
+    font-size: 12;
+}
+
+.ss-textr{
+    padding-right: 20px;
+    width: 140px;
+    text-align: right;
+    font-size: 12;
+}
+
+.high-low-icon {
+    background-color: transparent;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 40px;
+}
+
 .data {
-    padding: 10px;
+    padding: 1px;
+}
+
+/* Stuff for grid layout */ 
+.item1 { grid-area: header; }
+.item2 { grid-area: menu; }
+.item3 { grid-area: house; }
+.item4 { grid-area: out; }
+.item5 { grid-area: footer; }
+
+.grid-container {
+  display: grid;
+  grid-template-areas:
+    'header header header header header'
+    'menu house house out out'
+    'menu footer footer footer footer';
+  gap: 10px;
+  background-color: #2196F3;
+  padding: 10px;
+}
+
+.grid-container > div {
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 20px 0;
+}
+/* Stuff for switch */
+/* toggle in label designing */
+.toggle {
+    position : relative ;
+    display : inline-block;
+    width : 100px;
+    height : 52px;
+    background-color: red;
+    border-radius: 30px;
+    border: 2px solid gray;
+}
+       
+/* After slide changes */
+.toggle:after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: gray;
+    top: 1px; 
+    left: 1px;
+    transition:  all 0.5s;
+}
+
+ /* Checkbox checked effect */
+ .checkbox:checked + .toggle::after {
+    left : 49px; 
+}
+       
+/* Checkbox checked toggle label bg color */
+.checkbox:checked + .toggle {
+    background-color: green;
+}
+       
+/* Checkbox vanished */
+.checkbox { 
+    display : none;
 }

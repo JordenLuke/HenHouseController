@@ -1,6 +1,6 @@
 /*
  * Author: Jorden Luke
- * Date: [Date]
+ * Date: 05 - Mar - 2024
  * Description: [Brief description of the file's purpose]
  *
  * This code is released under the Yerba Mate license:
@@ -28,7 +28,7 @@ bool Light::isLightOn()
 
 uint8_t Light::setFlag(uint8_t flag)
 {
-    status &= ~(STATUS|ENABLED); //Don't allow the Enable bit and Satus bit to be set by flags
+    flag &= ~(STATUS|ENABLED); //Don't allow the Enable bit and Satus bit to be set by flags
     status|=flag;
     
     //check to see if the Light is Enabled

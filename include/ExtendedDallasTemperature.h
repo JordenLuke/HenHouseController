@@ -17,7 +17,7 @@ private:
     DallasData dallasData;
 
 public:
-    ExtendedDallasTemperature(OneWire onewire);
+    ExtendedDallasTemperature(OneWire* onewire);
     bool sampleData(DallasData &data);
     DallasData getClimateData() const;
     void begin();
